@@ -1,0 +1,4 @@
+{
+  "first thing": "$FIRST_VALUE",
+  "second thing": "$SECOND_VALUE"
+}

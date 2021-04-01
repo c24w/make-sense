@@ -1,0 +1,19 @@
+version: '2.4'
+
+services:
+  dependency:
+    image: busybox
+    stop_signal: SIGKILL
+    command: tail -f /dev/null
+
+  test:
+    image: busybox
+    depends_on:
+      - dependency
+    command: echo 'Tests passed!'
+
+  test-fail:
+    image: busybox
+    depends_on:
+      - dependency
+    command: sh -c 'echo "Tests failed!"; exit 1'
