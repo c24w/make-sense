@@ -36,11 +36,23 @@ test-fail-with-cleanup-and-correct-exit-code-using-logical-or:
 	docker-compose down
 	exit $$exit_status
 
+# This helper encapsulates the `docker-compose run` and captures its exit code.
+# The short-circuit ternary syntax prevents any potential `errexit` (fail fast
+# shell) from kicking in because: "The -e setting shall be ignored when
+# executinġ... any command of an AND-OR list other than the last" (from `man set`).
+
+# It always captures exit_status, to avoid falling foul of possible `nounset`
+# when the exit_status variable gets expanded.
+
+# Execute final `exit` in a subshell so it doesn't kill the current shell
+# (which would prevent subsequent commands) while still honouring the exit code
+# of the docker-compose run. This means `errexit` will behave as expected and
+# can still be used to control fail-fastness.
 define docker-compose-run
-	docker-compose run --rm $(1) || exit_status=$$?
-	[ $$exit_status -ne 0 ] && docker-compose logs
+	docker-compose run --rm $(1) && exit_status=$$? || exit_status=$$?
+	[ "$$exit_status" -ne 0 ] && docker-compose logs
 	docker-compose down
-	exit $$exit_status
+	(exit $$exit_status)
 endef
 
 docker-compose-run-fail-safe-idea:
