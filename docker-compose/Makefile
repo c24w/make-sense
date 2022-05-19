@@ -50,7 +50,7 @@ test-fail-with-cleanup-and-correct-exit-code-using-logical-or:
 # can still be used to control fail-fastness.
 define docker-compose-run
 	docker-compose run --rm $(1) && exit_status=$$? || exit_status=$$?
-	[ "$$exit_status" -ne 0 ] && docker-compose logs
+	[ "$$exit_status" -ne 0 ] && docker-compose ps && docker-compose logs
 	docker-compose down
 	(exit $$exit_status)
 endef
